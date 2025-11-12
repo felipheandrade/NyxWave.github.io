@@ -1,47 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
 
- // === ESQUECEU A SENHA? (versão toast minimalista) ===
-document.querySelector('.forgot-password-large').addEventListener('click', (e) => {
-    e.preventDefault();
-    
-    // Criar um input invisível para capturar o nome de usuário
-    const username = prompt('🔍 Digite seu nome de usuário:');
-    if (!username) return;
-
-    const users = JSON.parse(localStorage.getItem('nyxwave_users') || '{}');
-    const password = users[username];
-
-    if (password) {
-        // Mostrar senha no estilo toast (igual ao seu showToast)
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `
-            <strong>${username}</strong><br>
-            Senha: <code style="color:#ff2e63; background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">${password}</code>
-        `;
-        document.body.appendChild(toast);
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
-        setTimeout(() => toast.remove(), 2800);
-
-        // Preencher campos automaticamente
-        document.getElementById('username').value = username;
-        document.getElementById('password').value = password;
-    } else {
-        // Usar seu showToast existente
-        if (typeof showToast === 'function') {
-            showToast('Usuário não encontrado.');
-        } else {
-            const t = document.createElement('div');
-            t.className = 'toast';
-            t.textContent = 'Usuário não encontrado.';
-            document.body.appendChild(t);
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
-            setTimeout(() => t.remove(), 2300);
-        }
+    // === FUNÇÃO TOAST (PRIMEIRO) ===
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+        setTimeout(() => t.remove(), 2300);
     }
-});
+
+    // === ESQUECEU A SENHA? ===
+    document.querySelector('.forgot-password-large').addEventListener('click', (e) => {
+        e.preventDefault();
+        const username = prompt('Digite seu nome de usuário:');
+        if (!username) return;
+
+        const users = JSON.parse(localStorage.getItem('nyxwave_users') || '{}');
+        const password = users[username];
+
+        if (password) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <strong>${username}</strong><br>
+                Senha: <code style="color:#ff2e63; background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">${password}</code>
+            `;
+            document.body.appendChild(toast);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+            setTimeout(() => toast.remove(), 2800);
+
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        } else {
+            showToast('Usuário não encontrado.');
+        }
+    });
+
     document.querySelectorAll('.modal').forEach(modal => {
         modal.style.display = 'none';
     });
@@ -50,12 +47,6 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
     const loginScreen = document.getElementById('login-screen');
     const appContainer = document.getElementById('app-container');
     const overlay = document.getElementById('overlay');
-    const loginForm = document.getElementById('login-form');
-    const loginError = document.getElementById('login-error');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const togglePasswordBtn = document.getElementById('toggle-password');
-    const rememberCheckbox = document.getElementById('remember');
 
     // === TELA DE CADASTRO ===
     const signupScreen = document.createElement('div');
@@ -124,47 +115,37 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
     // === RESTAURAR USUÁRIO ===
     const savedUser = localStorage.getItem('musicPlayerUser');
     if (savedUser) {
-        usernameInput.value = savedUser;
-        rememberCheckbox.checked = true;
+        document.getElementById('username').value = savedUser;
+        document.getElementById('remember').checked = true;
     }
 
-    // === TOGGLE SENHA DO LOGIN ===
-    togglePasswordBtn.addEventListener('click', () => {
-        const type = passwordInput.type === 'password' ? 'text' : 'password';
-        passwordInput.type = type;
-        togglePasswordBtn.innerHTML = type === 'password' 
-            ? '<i class="far fa-eye"></i>' 
-            : '<i class="far fa-eye-slash"></i>';
+    // === TOGGLE SENHAS ===
+    document.getElementById('toggle-password').addEventListener('click', () => {
+        const input = document.getElementById('password');
+        const btn = document.getElementById('toggle-password');
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+        btn.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
     });
 
-    // === TOGGLE SENHAS DO CADASTRO (CORRIGIDO) ===
     document.addEventListener('click', (e) => {
-        // Toggle para nova senha
         if (e.target.closest('#toggle-signup-password')) {
             const input = document.getElementById('new-password');
-            if (input) {
-                const isPassword = input.type === 'password';
-                input.type = isPassword ? 'text' : 'password';
-                e.target.closest('button').innerHTML = isPassword 
-                    ? '<i class="far fa-eye-slash"></i>' 
-                    : '<i class="far fa-eye"></i>';
-            }
+            const btn = e.target.closest('button');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            btn.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
         }
-
-        // Toggle para confirmar senha
         if (e.target.closest('#toggle-confirm-password')) {
             const input = document.getElementById('confirm-password');
-            if (input) {
-                const isPassword = input.type === 'password';
-                input.type = isPassword ? 'text' : 'password';
-                e.target.closest('button').innerHTML = isPassword 
-                    ? '<i class="far fa-eye-slash"></i>' 
-                    : '<i class="far fa-eye"></i>';
-            }
+            const btn = e.target.closest('button');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            btn.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
         }
     });
 
-    // === NAVEGAÇÃO ENTRE TELAS ===
+    // === NAVEGAÇÃO ===
     document.getElementById('show-signup').addEventListener('click', (e) => {
         e.preventDefault();
         loginScreen.classList.remove('active');
@@ -243,21 +224,13 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
         }
     });
 
-    // === ANIMAÇÃO INICIAL (PROTEGIDA CONTRA ERROS) ===
+    // === ANIMAÇÃO INICIAL ===
     setTimeout(() => {
-        try {
-            introScreen.classList.add('hidden');
-            setTimeout(() => {
-                loginScreen.classList.add('active');
-                overlay.classList.add('active');
-            }, 300);
-        } catch (err) {
-            console.error("Erro ao esconder intro:", err);
-            // Fallback seguro
-            if (introScreen) introScreen.style.display = 'none';
-            if (loginScreen) loginScreen.style.display = 'block';
-            if (overlay) overlay.style.display = 'block';
-        }
+        introScreen.classList.add('hidden');
+        setTimeout(() => {
+            loginScreen.classList.add('active');
+            overlay.classList.add('active');
+        }, 300);
     }, 2000);
 
     // === PLAYER ===
@@ -271,14 +244,14 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
             { path: 'assets/5.mp3', displayName: 'Gods Plan', cover: 'assets/5.jpg', artist: 'Drake', favorite: false },
             { path: 'assets/6.mp3', displayName: 'OQQELESVAOFALAR?', cover: 'assets/6.jpg', artist: 'Teto', favorite: false },
         ];
-
         let musicIndex = 0;
         let isPlaying = false;
         let isShuffle = false;
         let isRepeat = false;
         let lastPlayedSongPath = null;
+        let userInteracted = false;
 
-        // Elementos
+        // Elementos do DOM
         const cover = document.getElementById('cover');
         const title = document.getElementById('music-title');
         const artist = document.getElementById('music-artist');
@@ -301,6 +274,7 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
         const shuffleBtn = document.getElementById('shuffle');
         const repeatBtn = document.getElementById('repeat');
         const themeToggle = document.getElementById('theme-toggle');
+        const themeNeon = document.getElementById('theme-neon');
         const equalizerEl = document.getElementById('equalizer');
         const playerProgress = document.getElementById('player-progress');
         const progress = document.getElementById('progress');
@@ -325,169 +299,7 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
         const usernameDisplay = document.getElementById('username-display');
         const playCountEl = document.getElementById('play-count');
 
-        // Atualizar perfil
-        function updateProfileDisplay() {
-            if (loggedUser) {
-                usernameDisplay.textContent = loggedUser;
-                const stats = getPlaybackStats(loggedUser);
-                const totalPlays = Object.values(stats).reduce((a, b) => a + b, 0);
-                playCountEl.textContent = `${totalPlays} música${totalPlays !== 1 ? 's' : ''}`;
-            } else {
-                usernameDisplay.textContent = 'Convidado';
-                playCountEl.textContent = '0 músicas';
-            }
-        }
-
-        // Equalizador
-        const colors = ['#ff0000','#ff4000','#ff8000','#ffbf00','#ffff00','#bfff00','#80ff00','#40ff00','#00ff00','#00ff40','#00ff80','#00ffbf','#00ffff','#00bfff','#0080ff','#0040ff','#0000ff','#4000ff','#8000ff','#bf00ff','#ff00ff','#ff00bf','#ff0080','#ff0040'];
-        for (let i = 0; i < 32; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            bar.style.backgroundColor = colors[i % colors.length] || '#0e0d0d';
-            equalizerEl.appendChild(bar);
-        }
-        const bars = equalizerEl.querySelectorAll('.bar');
-
-        // Web Audio API
-        let audioCtx, analyser, dataArray;
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            const source = audioCtx.createMediaElementSource(music);
-            analyser = audioCtx.createAnalyser();
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            analyser.fftSize = 64;
-            const bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
-        } catch (e) {
-            console.error("Erro ao criar AudioContext:", e);
-        }
-
-        // Funções
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'toast';
-            t.textContent = msg;
-            document.body.appendChild(t);
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
-            setTimeout(() => t.remove(), 2300);
-        }
-
-        function loadMusic(song) {
-            music.src = song.path;
-            title.textContent = song.displayName;
-            artist.textContent = song.artist;
-            cover.src = song.cover || 'https://via.placeholder.com/300?text=Capa';
-            bgImg.src = song.cover || 'https://via.placeholder.com/1920?text=Fundo';
-            const stats = getPlaybackStats(loggedUser || '');
-            const playCount = stats[song.path] || 0;
-            title.title = `Reproduzida ${playCount} vez(es)`;
-            favoriteToggle.innerHTML = playlist[musicIndex].favorite ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
-            lyricsTitle.textContent = `Letra: ${song.displayName}`;
-            updateMiniPlayer();
-        }
-
-        function updateMiniPlayer() {
-            const song = playlist[musicIndex];
-            document.getElementById('mini-cover').src = song.cover || 'https://via.placeholder.com/50';
-            document.getElementById('mini-title').textContent = song.displayName;
-            document.getElementById('mini-artist').textContent = song.artist;
-            miniPlay.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
-        }
-
-        function togglePlay() {
-            if (isPlaying) {
-                music.pause();
-                playBtn.className = 'fas fa-play play-button';
-                miniPlay.className = 'fas fa-play';
-                isPlaying = false;
-            } else {
-                music.play();
-                playBtn.className = 'fas fa-pause play-button';
-                miniPlay.className = 'fas fa-pause';
-                isPlaying = true;
-                if (audioCtx) audioCtx.resume();
-            }
-        }
-
-        function nextSong() {
-            if (isShuffle && playlist.length > 1) {
-                let idx;
-                do { idx = Math.floor(Math.random() * playlist.length); }
-                while (idx === musicIndex);
-                musicIndex = idx;
-            } else {
-                musicIndex = (musicIndex + 1) % playlist.length;
-            }
-            loadMusic(playlist[musicIndex]);
-            isPlaying = true;
-            music.play();
-            playBtn.className = 'fas fa-pause play-button';
-            miniPlay.className = 'fas fa-pause';
-            if (audioCtx) audioCtx.resume();
-        }
-
-        function prevSong() {
-            if (isShuffle && playlist.length > 1) {
-                let idx;
-                do { idx = Math.floor(Math.random() * playlist.length); }
-                while (idx === musicIndex);
-                musicIndex = idx;
-            } else {
-                musicIndex = (musicIndex - 1 + playlist.length) % playlist.length;
-            }
-            loadMusic(playlist[musicIndex]);
-            isPlaying = true;
-            music.play();
-            playBtn.className = 'fas fa-pause play-button';
-            miniPlay.className = 'fas fa-pause';
-            if (audioCtx) audioCtx.resume();
-        }
-
-        function updateProgress() {
-            if (isNaN(music.duration)) return;
-            const pct = (music.currentTime / music.duration) * 100;
-            progress.style.width = `${pct}%`;
-            const fmt = t => {
-                const m = Math.floor(t / 60);
-                const s = Math.floor(t % 60);
-                return `${m}:${s.toString().padStart(2, '0')}`;
-            };
-            durationEl.textContent = fmt(music.duration);
-            currentTimeEl.textContent = fmt(music.currentTime);
-        }
-
-        function setProgress(e) {
-            const rect = playerProgress.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            music.currentTime = (clickX / rect.width) * music.duration;
-        }
-
-        function renderPlaylist() {
-            playlistList.innerHTML = '';
-            playlist.forEach((song, i) => {
-                const item = document.createElement('div');
-                item.className = 'music-item';
-                if (i === musicIndex) item.classList.add('active');
-                item.innerHTML = `
-                    <img src="${song.cover || 'https://via.placeholder.com/50?text=Capa'}">
-                    <div class="music-info">
-                        <h4>${song.displayName}</h4>
-                        <p>${song.artist}</p>
-                    </div>
-                `;
-                item.addEventListener('click', () => {
-                    musicIndex = i;
-                    loadMusic(playlist[musicIndex]);
-                    togglePlay();
-                    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-                });
-                playlistList.appendChild(item);
-            });
-        }
-
+        // === BUSCA LOCAL (SEM YOUTUBE) ===
         function filterSongs() {
             const term = searchInput.value.toLowerCase().trim();
             playlistModal.style.display = 'flex';
@@ -501,7 +313,7 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
             );
             playlistList.innerHTML = '';
             if (filtered.length === 0) {
-                playlistList.innerHTML = '<p style="text-align:center;color:#666;padding:20px;">Nenhuma música encontrada</p>';
+                playlistList.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">Nenhuma música encontrada</p>';
                 return;
             }
             filtered.forEach(song => {
@@ -520,7 +332,7 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
                         musicIndex = idx;
                         loadMusic(playlist[musicIndex]);
                         togglePlay();
-                        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                        playlistModal.style.display = 'none';
                         searchInput.value = '';
                     }
                 });
@@ -528,188 +340,365 @@ document.querySelector('.forgot-password-large').addEventListener('click', (e) =
             });
         }
 
-        function toggleShuffle() {
-            isShuffle = !isShuffle;
-            shuffleBtn.classList.toggle('active-control', isShuffle);
+        function updateProfileDisplay() {
+            if (loggedUser) {
+                usernameDisplay.textContent = loggedUser;
+                const stats = getPlaybackStats(loggedUser);
+                const totalPlays = Object.values(stats).reduce((a, b) => a + b, 0);
+                playCountEl.textContent = `${totalPlays} música${totalPlays !== 1 ? 's' : ''}`;
+            } else {
+                usernameDisplay.textContent = 'Convidado';
+                playCountEl.textContent = '0 músicas';
+            }
         }
 
-        function toggleRepeat() {
-            isRepeat = !isRepeat;
-            repeatBtn.classList.toggle('active-control', isRepeat);
+        // Equalizer
+        const colors = ['#ff0000','#ff4000','#ff8000','#ffbf00','#ffff00','#bfff00','#80ff00','#40ff00','#00ff00','#00ff40','#00ff80','#00ffbf','#00ffff','#00bfff','#0080ff','#0040ff','#0000ff','#4000ff','#8000ff','#bf00ff','#ff00ff','#ff00bf','#ff0080','#ff0040'];
+        for (let i = 0; i < 32; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.backgroundColor = colors[i % colors.length];
+            equalizerEl.appendChild(bar);
+        }
+        const bars = equalizerEl.querySelectorAll('.bar');
+
+        let audioCtx, analyser, dataArray;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            const source = audioCtx.createMediaElementSource(music);
+            analyser = audioCtx.createAnalyser();
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            analyser.fftSize = 64;
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+        } catch (e) { console.error(e); }
+
+        function loadMusic(song) {
+            // Remover iframe do YouTube, se existir
+            if (window.currentYoutube) {
+                window.currentYoutube.remove();
+                window.currentYoutube = null;
+            }
+
+            // Carregar o áudio normalmente (funciona para arquivos locais)
+            music.src = song.path;
+
+            title.textContent = song.displayName;
+            artist.textContent = song.artist;
+            cover.src = song.cover || 'https://via.placeholder.com/300?text=Capa';
+            bgImg.src = song.cover || 'https://via.placeholder.com/1920?text=Fundo';
+            favoriteToggle.innerHTML = song.favorite ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            lyricsTitle.textContent = `Letra: ${song.displayName}`;
+            updateMiniPlayer();
         }
 
-        function animateEqualizer() {
-            if (!isPlaying) {
-                bars.forEach(b => b.style.height = '2px');
-                requestAnimationFrame(animateEqualizer);
+        function updateMiniPlayer() {
+            const song = playlist[musicIndex];
+            document.getElementById('mini-cover').src = song.cover || 'https://via.placeholder.com/50';
+            document.getElementById('mini-title').textContent = song.displayName;
+            document.getElementById('mini-artist').textContent = song.artist;
+            miniPlay.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+        }
+
+        function togglePlay() {
+            userInteracted = true;
+            if (isPlaying) {
+                music.pause();
+            } else {
+                music.play().catch(() => {
+                    showToast('Clique em Play novamente para ativar o som!');
+                });
+                if (audioCtx) audioCtx.resume();
+            }
+            isPlaying = !isPlaying;
+            playBtn.className = isPlaying ? 'fas fa-pause play-button' : 'fas fa-play play-button';
+            miniPlay.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+        }
+
+        function nextSong() {
+            let newIndex = musicIndex;
+            if (isShuffle && playlist.length > 1) {
+                do { newIndex = Math.floor(Math.random() * playlist.length); }
+                while (newIndex === musicIndex);
+            } else {
+                newIndex = (musicIndex + 1) % playlist.length;
+            }
+            musicIndex = newIndex;
+            loadMusic(playlist[musicIndex]);
+            if (isPlaying) music.play();
+        }
+
+        function prevSong() {
+            let newIndex = musicIndex;
+            if (isShuffle && playlist.length > 1) {
+                do { newIndex = Math.floor(Math.random() * playlist.length); }
+                while (newIndex === musicIndex);
+            } else {
+                newIndex = (musicIndex - 1 + playlist.length) % playlist.length;
+            }
+            musicIndex = newIndex;
+            loadMusic(playlist[musicIndex]);
+            if (isPlaying) music.play();
+        }
+
+        function updateProgress() {
+            if (isNaN(music.duration)) return;
+            const pct = (music.currentTime / music.duration) * 100;
+            progress.style.width = `${pct}%`;
+            const fmt = t => `${Math.floor(t/60)}:${(Math.floor(t%60)).toString().padStart(2,'0')}`;
+            currentTimeEl.textContent = fmt(music.currentTime);
+            durationEl.textContent = fmt(music.duration);
+        }
+
+        function setProgress(e) {
+            const rect = playerProgress.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            music.currentTime = (clickX / rect.width) * music.duration;
+        }
+
+        function renderPlaylist() {
+            playlistList.innerHTML = '';
+            if (playlist.length === 0) {
+                playlistList.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">Nenhuma música na playlist.</p>';
                 return;
             }
-            if (analyser) {
-                analyser.getByteFrequencyData(dataArray);
-                for (let i = 0; i < bars.length; i++) {
-                    const h = Math.max(2, dataArray[i] / 4);
-                    bars[i].style.height = `${h}px`;
-                }
-            }
-            requestAnimationFrame(animateEqualizer);
+            playlist.forEach((song, i) => {
+                const item = document.createElement('div');
+                item.className = `music-item ${i === musicIndex ? 'active' : ''}`;
+                item.innerHTML = `
+                    <img src="${song.cover || 'https://via.placeholder.com/50?text=Capa'}">
+                    <div class="music-info">
+                        <h4>${song.displayName}</h4>
+                        <p>${song.artist}</p>
+                    </div>
+                `;
+                item.onclick = () => {
+                    musicIndex = i;
+                    loadMusic(song);
+                    togglePlay();
+                    playlistModal.style.display = 'none';
+                };
+                playlistList.appendChild(item);
+            });
         }
 
-        // Eventos
-        playBtn.addEventListener('click', togglePlay);
-        prevBtn.addEventListener('click', prevSong);
-        nextBtn.addEventListener('click', nextSong);
-        miniPlay.addEventListener('click', togglePlay);
-        miniPrev.addEventListener('click', prevSong);
-        miniNext.addEventListener('click', nextSong);
-        music.addEventListener('timeupdate', updateProgress);
-        playerProgress.addEventListener('click', setProgress);
-        music.addEventListener('ended', () => {
-            if (isRepeat) {
-                music.currentTime = 0;
-                music.play();
-            } else {
-                nextSong();
-            }
-        });
+        // === CONTROLES ===
+        playBtn.onclick = togglePlay;
+        prevBtn.onclick = prevSong;
+        nextBtn.onclick = nextSong;
+        miniPlay.onclick = togglePlay;
+        miniPrev.onclick = prevSong;
+        miniNext.onclick = nextSong;
+        playerProgress.onclick = setProgress;
+        music.ontimeupdate = updateProgress;
+        music.onended = () => isRepeat ? music.play() : nextSong();
 
-        favoriteToggle.addEventListener('click', () => {
+        favoriteToggle.onclick = () => {
             playlist[musicIndex].favorite = !playlist[musicIndex].favorite;
             favoriteToggle.innerHTML = playlist[musicIndex].favorite ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
-            showToast(playlist[musicIndex].favorite ? '❤️ Favorito!' : '💔 Removido');
-        });
+            showToast(playlist[musicIndex].favorite ? 'Adicionado aos favoritos!' : 'Removido dos favoritos');
+        };
 
-        favoritesBtn.addEventListener('click', () => {
+        favoritesBtn.onclick = () => {
             favoritesModal.style.display = 'flex';
-            favoritesList.innerHTML = playlist
-                .filter(s => s.favorite)
-                .map(s => `
+            const favs = playlist.filter(s => s.favorite);
+            favoritesList.innerHTML = favs.length ? favs.map(s => {
+                const idx = playlist.indexOf(s);
+                return `
                     <div class="music-item">
-                        <img src="${s.cover || 'https://via.placeholder.com/50?text=Capa'}">
-                        <div class="music-info">
-                            <h4>${s.displayName}</h4>
-                            <p>${s.artist}</p>
-                        </div>
+                        <img src="${s.cover || 'https://via.placeholder.com/50'}">
+                        <div class="music-info"><h4>${s.displayName}</h4><p>${s.artist}</p></div>
                     </div>
-                `).join('') || '<p style="text-align:center;padding:20px;color:#666;">Nenhum favorito</p>';
-        });
+                `;
+            }).join('') : '<p style="text-align:center;color:#aaa;padding:20px;">Nenhum favorito</p>';
 
-        lyricsBtn.addEventListener('click', async () => {
+            favoritesList.querySelectorAll('.music-item').forEach((item, i) => {
+                item.onclick = () => {
+                    musicIndex = playlist.indexOf(favs[i]);
+                    loadMusic(playlist[musicIndex]);
+                    togglePlay();
+                    favoritesModal.style.display = 'none';
+                };
+            });
+        };
+
+        lyricsBtn.onclick = async () => {
             lyricsModal.style.display = 'flex';
+            const s = playlist[musicIndex];
             try {
-                const s = playlist[musicIndex];
                 const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(s.artist)}/${encodeURIComponent(s.displayName)}`);
                 const d = await res.json();
                 lyricsContent.textContent = d.lyrics || 'Letra não encontrada.';
             } catch {
                 lyricsContent.textContent = 'Erro ao carregar letra.';
             }
-        });
+        };
 
-        playlistBtn.addEventListener('click', () => {
-            playlistModal.style.display = 'flex';
-            renderPlaylist();
-        });
-
-        uploadBtn.addEventListener('click', () => fileUpload.click());
-        fileUpload.addEventListener('change', e => {
+        playlistBtn.onclick = () => { playlistModal.style.display = 'flex'; renderPlaylist(); };
+        uploadBtn.onclick = () => fileUpload.click();
+        fileUpload.onchange = e => {
+            let addedCount = 0;
             [...e.target.files].forEach(file => {
-                if (!file.type.startsWith('audio/')) return;
-                playlist.push({
-                    path: URL.createObjectURL(file),
-                    displayName: file.name.replace(/\.[^/.]+$/, ""),
-                    cover: 'https://via.placeholder.com/300?text=Upload',
-                    artist: 'Você',
-                    favorite: false
-                });
+                if (file.type.startsWith('audio/')) {
+                    const displayName = file.name.replace(/\.([^.]*)$/, "");
+                    playlist.push({
+                        path: URL.createObjectURL(file),
+                        displayName: displayName,
+                        cover: 'https://via.placeholder.com/300?text=Upload',
+                        artist: 'Você',
+                        favorite: false
+                    });
+                    addedCount++;
+                }
             });
             renderPlaylist();
-            showToast(`✅ ${e.target.files.length} música(s) adicionada(s)!`);
+            showToast(`${addedCount} música(s) adicionada(s)!`);
             e.target.value = '';
+        };
+
+        // === BUSCA LOCAL (SEM YOUTUBE) ===
+        searchInput.addEventListener('input', () => {
+            filterSongs();
         });
 
-        searchInput.addEventListener('input', filterSongs);
-
-        [closeFavorites, closeLyrics, closePlaylist, closeProfile].forEach(btn =>
-            btn.addEventListener('click', () => btn.closest('.modal').style.display = 'none')
-        );
-
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.style.display = 'none';
-                });
-            }
+        [closeFavorites, closeLyrics, closePlaylist, closeProfile].forEach(btn => {
+            btn.onclick = () => btn.closest('.modal').style.display = 'none';
         });
 
-        shuffleBtn.addEventListener('click', toggleShuffle);
-        repeatBtn.addEventListener('click', toggleRepeat);
+        shuffleBtn.onclick = () => { isShuffle = !isShuffle; shuffleBtn.classList.toggle('active-control', isShuffle); };
+        repeatBtn.onclick = () => { isRepeat = !isRepeat; repeatBtn.classList.toggle('active-control', isRepeat); };
 
-        volumeSlider.addEventListener('input', () => {
+        volumeSlider.oninput = () => {
             const v = volumeSlider.value / 100;
             music.volume = v;
             volumeIcon.className = v === 0 ? 'fas fa-volume-mute' : v < 0.5 ? 'fas fa-volume-down' : 'fas fa-volume-up';
-        });
+        };
 
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            themeToggle.className = document.body.classList.contains('light-theme') ? 'fas fa-sun' : 'fas fa-moon';
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                togglePlay();
-            } else if (e.code === 'ArrowRight') {
-                nextSong();
-            } else if (e.code === 'ArrowLeft') {
-                prevSong();
+        // === TEMA NEON (ALTERADO) ===
+        function setTheme(theme) {
+            document.body.className = ''; // Limpa todos os temas
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                themeToggle.className = 'fas fa-sun';
+                themeNeon.classList.remove('active');
+            } else if (theme === 'neon') {
+                document.body.classList.add('neon-theme');
+                themeNeon.className = 'fas fa-lightbulb active';
+                themeToggle.className = 'fas fa-moon';
+            } else {
+                document.body.classList.remove('light-theme');
+                themeToggle.className = 'fas fa-moon';
+                themeNeon.classList.remove('active');
             }
-        });
+        }
 
-        // === CONTAGEM CORRETA (+1) ===
-        music.addEventListener('play', () => {
-            if (loggedUser) {
-                const currentSongPath = playlist[musicIndex].path;
-                if (currentSongPath !== lastPlayedSongPath) {
-                    savePlaybackStats(loggedUser, currentSongPath);
-                    lastPlayedSongPath = currentSongPath;
-                    const stats = getPlaybackStats(loggedUser);
-                    const playCount = stats[currentSongPath] || 0;
-                    title.title = `Reproduzida ${playCount} vez(es)`;
-                    updateProfileDisplay();
-                }
+        themeToggle.onclick = () => {
+            if (document.body.classList.contains('neon-theme')) {
+                setTheme('dark'); // volta ao escuro
+            } else if (document.body.classList.contains('light-theme')) {
+                setTheme('neon');
+            } else {
+                setTheme('light');
+            }
+        };
+
+        themeNeon.onclick = () => {
+            if (document.body.classList.contains('neon-theme')) {
+                setTheme('dark');
+            } else {
+                setTheme('neon');
+            }
+        };
+
+        document.onkeydown = e => {
+            if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+            else if (e.code === 'ArrowRight') nextSong();
+            else if (e.code === 'ArrowLeft') prevSong();
+        };
+
+        music.onplay = () => {
+            if (loggedUser && playlist[musicIndex].path !== lastPlayedSongPath) {
+                savePlaybackStats(loggedUser, playlist[musicIndex].path);
+                lastPlayedSongPath = playlist[musicIndex].path;
+                updateProfileDisplay();
+                renderTopSongs();
             }
             updateMiniPlayer();
-            setTimeout(() => {
-                miniPlayer.style.display = 'flex';
-                miniPlayer.classList.add('show');
-            }, 500);
-        });
+            setTimeout(() => { miniPlayer.style.display = 'flex'; miniPlayer.classList.add('show'); }, 500);
+            animateEqualizer();
+        };
 
-        // === BOTÃO DE PERFIL ABRE MODAL ===
-        document.getElementById('user-profile').addEventListener('click', () => {
+        document.getElementById('user-profile').onclick = () => {
             if (!loggedUser) return;
             const stats = getPlaybackStats(loggedUser);
-            const totalPlays = Object.values(stats).reduce((a, b) => a + b, 0);
-            profileContent.innerHTML = `
-                <p>Olá, <strong>${loggedUser}</strong></p>
-                <p>Você ouviu <strong>${totalPlays}</strong> músicas no NyxWave!</p>
-            `;
+            const total = Object.values(stats).reduce((a,b) => a+b, 0);
+            profileContent.innerHTML = `<p>Olá, <strong>${loggedUser}</strong>!</p><p>Você ouviu <strong>${total}</strong> música${total !== 1 ? 's' : ''}!</p>`;
             profileModal.style.display = 'flex';
-        });
+        };
+
+        function renderTopSongs() {
+            const section = document.getElementById('top-songs-section');
+            const list = document.getElementById('top-songs-list');
+            if (!loggedUser || !section) return;
+
+            const stats = getPlaybackStats(loggedUser);
+            const sorted = Object.entries(stats).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            if (sorted.length === 0) { section.style.display = 'none'; return; }
+
+            section.style.display = 'block';
+            list.innerHTML = sorted.map(([path, count]) => {
+                const song = playlist.find(s => s.path === path) || { displayName: 'Desconhecida', artist: 'Você', cover: 'https://via.placeholder.com/300?text=?' };
+                return `
+                    <div class="top-song-item">
+                        <img src="${song.cover}" alt="">
+                        <div class="top-song-info">
+                            <h4 title="${song.displayName}">${song.displayName}</h4>
+                            <p>${song.artist}</p>
+                        </div>
+                        <div class="play-count-badge">${count}×</div>
+                    </div>
+                `;
+            }).join('');
+            list.querySelectorAll('.top-song-item').forEach((item, i) => {
+                item.onclick = () => {
+                    const path = sorted[i][0];
+                    const idx = playlist.findIndex(s => s.path === path);
+                    if (idx !== -1) {
+                        musicIndex = idx;
+                        loadMusic(playlist[idx]);
+                        togglePlay();
+                    }
+                };
+            });
+        }
+
+        function animateEqualizer() {
+            if (!isPlaying) { 
+                bars.forEach(b => b.style.height = '2px'); 
+                requestAnimationFrame(animateEqualizer); 
+                return; 
+            }
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                bars.forEach((b, i) => b.style.height = `${Math.max(2, dataArray[i] / 4)}px`);
+            }
+            requestAnimationFrame(animateEqualizer);
+        }
 
         // Iniciar
         updateProfileDisplay();
-        loadMusic(playlist[musicIndex]);
+        loadMusic(playlist[0]);
         renderPlaylist();
+        renderTopSongs();
         animateEqualizer();
     }
 });
 
+// Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado', reg))
-            .catch(err => console.log('Erro ao registrar Service Worker', err));
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
     });
 }
