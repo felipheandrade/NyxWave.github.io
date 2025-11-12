@@ -6,7 +6,7 @@
     <title>NyxWave</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff2e63">
-    <link rel="icon" href="assets/nyxwave-logo-transparent.png" type="image/png">
+    <link rel="icon" href="assets/nyxwave-logo-transparentt.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="site.css">
     <link rel="manifest" href="manifest.json">
@@ -69,8 +69,11 @@
 
     <!-- Container principal do player -->
     <div id="app-container" style="display: none;">
-        <i class="fas fa-moon" id="theme-toggle" title="Mudar tema"></i>
-        
+        <div class="theme-selector">
+            <i class="fas fa-moon" id="theme-toggle" title="Mudar tema"></i>
+            <i class="fas fa-lightbulb" id="theme-neon" title="Tema Neon"></i>
+        </div>
+
         <!-- Botão de Perfil (com avatar funcional) -->
         <div id="user-profile" class="mini-player-style">
             <div class="avatar-container">
@@ -138,6 +141,13 @@
             <input type="file" id="file-upload" accept="audio/*" multiple style="display: none;">
         </div>
 
+        <div id="top-songs-section" style="display: none; margin-top: 30px; padding: 0 30px;">
+            <h3 style="color: #ff2e63; margin-bottom: 15px; font-size: 18px; text-align: center;">
+                <i class="fas fa-fire"></i> Mais Ouvidas
+            </h3>
+            <div id="top-songs-list" class="top-songs-grid"></div>
+        </div>
+
         <!-- Modais -->
         <div class="modal" id="favorites-modal">
             <div class="modal-content">
@@ -199,28 +209,29 @@
     </div>
 
     <!-- Modal de Recuperação de Senha -->
-<div class="modal" id="forgot-password-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-unlock-alt"></i> Recuperar Senha</h3>
-            <span class="close-btn" id="close-forgot">&times;</span>
-        </div>
-        <div class="modal-body" style="padding: 20px;">
-            <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">
-                Digite seu nome de usuário para visualizar sua senha.
-            </p>
-            <div class="input-group-large" style="margin: 0;">
-                <i class="fas fa-user"></i>
-                <input type="text" id="forgot-username" placeholder="Seu usuário" autocomplete="off">
+    <div class="modal" id="forgot-password-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-unlock-alt"></i> Recuperar Senha</h3>
+                <span class="close-btn" id="close-forgot">&times;</span>
             </div>
-            <div id="forgot-message" style="margin-top: 15px; min-height: 20px; font-size: 14px;"></div>
-            <button id="forgot-submit" style="width: 100%; padding: 12px; margin-top: 15px; background: #ff2e63; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
-                Recuperar
-            </button>
+            <div class="modal-body" style="padding: 20px;">
+                <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">
+                    Digite seu nome de usuário para visualizar sua senha.
+                </p>
+                <div class="input-group-large" style="margin: 0;">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="forgot-username" placeholder="Seu usuário" autocomplete="off">
+                </div>
+                <div id="forgot-message" style="margin-top: 15px; min-height: 20px; font-size: 14px;"></div>
+                <button id="forgot-submit" style="width: 100%; padding: 12px; margin-top: 15px; background: #ff2e63; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
+                    Recuperar
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
     <script src="index.js"></script>
 </body>
 </html>
+
